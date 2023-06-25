@@ -1,3 +1,4 @@
+import { User } from "../components/login";
 import { ACCESS_CODE_PREFIX } from "../constant";
 import { ChatMessage, ModelConfig, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
@@ -94,6 +95,9 @@ export class ClientApi {
 export const api = new ClientApi();
 
 export function getHeaders() {
+  const userString = localStorage.getItem("user");
+  const user: User = userString ? JSON.parse(userString) : null;
+
   const accessStore = useAccessStore.getState();
   let headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -104,8 +108,10 @@ export function getHeaders() {
   const validString = (x: string) => x && x.length > 0;
 
   // use user's api key first
-  if (validString(accessStore.token)) {
-    headers.Authorization = makeBearer(accessStore.token);
+  // if (validString(accessStore.token)) {
+  if (validString(user.token)) {
+    // headers.Authorization = makeBearer(accessStore.token);
+    headers.Authorization = user.token;
   } else if (
     accessStore.enabledAccessControl() &&
     validString(accessStore.accessCode)

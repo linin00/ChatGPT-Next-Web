@@ -11,7 +11,7 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     console.log("Form data:", { username, password });
 
@@ -32,7 +32,6 @@ export function Login() {
         console.log("登录成功");
         // 处理登录成功的逻辑，例如跳转到主页
         response.json().then((body) => {
-          console.log(body);
           const user: User = body.data;
           console.log(user); // 打印读取到的数据
           localStorage.setItem("user", JSON.stringify(user));
@@ -80,7 +79,6 @@ export function Login() {
 export function isLogin() {
   const userString = localStorage.getItem("user");
   const user: User = userString ? JSON.parse(userString) : null;
-  // localStorage.removeItem('user');
   //todo: check token
   if (user) {
     return true;
@@ -88,13 +86,13 @@ export function isLogin() {
   return false;
 }
 
+export function logout() {
+  localStorage.removeItem("user");
+  window.location.href = "/";
+}
+
 export function getUser() {
   const userString = localStorage.getItem("user");
   const user: User = userString ? JSON.parse(userString) : null;
   return user;
-}
-
-export function logout() {
-  localStorage.removeItem("user");
-  window.location.href = "/";
 }
