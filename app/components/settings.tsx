@@ -45,6 +45,7 @@ import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarPicker } from "./emoji";
+import { getUser, User } from "./login";
 
 function EditPromptModal(props: { id: number; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -284,6 +285,8 @@ export function Settings() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const user: User = getUser();
+  console.log(user);
 
   return (
     <ErrorBoundary>
@@ -297,30 +300,34 @@ export function Settings() {
           </div>
         </div>
         <div className="window-actions">
-          <div className="window-action-button">
-            <IconButton
-              icon={<ClearIcon />}
-              onClick={() => {
-                if (confirm(Locale.Settings.Actions.ConfirmClearAll)) {
-                  chatStore.clearAllData();
-                }
-              }}
-              bordered
-              title={Locale.Settings.Actions.ClearAll}
-            />
-          </div>
-          <div className="window-action-button">
-            <IconButton
-              icon={<ResetIcon />}
-              onClick={() => {
-                if (confirm(Locale.Settings.Actions.ConfirmResetAll)) {
-                  resetConfig();
-                }
-              }}
-              bordered
-              title={Locale.Settings.Actions.ResetAll}
-            />
-          </div>
+          {user.role == "admin" && (
+            <>
+              <div className="window-action-button">
+                <IconButton
+                  icon={<ClearIcon />}
+                  onClick={() => {
+                    if (confirm(Locale.Settings.Actions.ConfirmClearAll)) {
+                      chatStore.clearAllData();
+                    }
+                  }}
+                  bordered
+                  title={Locale.Settings.Actions.ClearAll}
+                />
+              </div>
+              <div className="window-action-button">
+                <IconButton
+                  icon={<ResetIcon />}
+                  onClick={() => {
+                    if (confirm(Locale.Settings.Actions.ConfirmResetAll)) {
+                      resetConfig();
+                    }
+                  }}
+                  bordered
+                  title={Locale.Settings.Actions.ResetAll}
+                />
+              </div>
+            </>
+          )}
           <div className="window-action-button">
             <IconButton
               icon={<CloseIcon />}
@@ -355,30 +362,36 @@ export function Settings() {
             </Popover>
           </ListItem>
 
-          <ListItem
-            title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
-            subTitle={
-              checkingUpdate
-                ? Locale.Settings.Update.IsChecking
-                : hasNewVersion
-                ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
-                : Locale.Settings.Update.IsLatest
-            }
-          >
-            {checkingUpdate ? (
-              <LoadingIcon />
-            ) : hasNewVersion ? (
-              <Link href={UPDATE_URL} target="_blank" className="link">
-                {Locale.Settings.Update.GoToUpdate}
-              </Link>
-            ) : (
-              <IconButton
-                icon={<ResetIcon></ResetIcon>}
-                text={Locale.Settings.Update.CheckUpdate}
-                onClick={() => checkUpdate(true)}
-              />
-            )}
-          </ListItem>
+          {user.role == "admin" ? (
+            <ListItem
+              title={Locale.Settings.Update.Version(
+                currentVersion ?? "unknown",
+              )}
+              subTitle={
+                checkingUpdate
+                  ? Locale.Settings.Update.IsChecking
+                  : hasNewVersion
+                  ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
+                  : Locale.Settings.Update.IsLatest
+              }
+            >
+              {checkingUpdate ? (
+                <LoadingIcon />
+              ) : hasNewVersion ? (
+                <Link href={UPDATE_URL} target="_blank" className="link">
+                  {Locale.Settings.Update.GoToUpdate}
+                </Link>
+              ) : (
+                <IconButton
+                  icon={<ResetIcon></ResetIcon>}
+                  text={Locale.Settings.Update.CheckUpdate}
+                  onClick={() => checkUpdate(true)}
+                />
+              )}
+            </ListItem>
+          ) : (
+            <></>
+          )}
 
           <ListItem title={Locale.Settings.SendKey}>
             <Select
@@ -483,65 +496,69 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List>
-          {enabledAccessControl ? (
-            <ListItem
-              title={Locale.Settings.AccessCode.Title}
-              subTitle={Locale.Settings.AccessCode.SubTitle}
-            >
-              <PasswordInput
-                value={accessStore.accessCode}
-                type="text"
-                placeholder={Locale.Settings.AccessCode.Placeholder}
-                onChange={(e) => {
-                  accessStore.updateCode(e.currentTarget.value);
-                }}
-              />
-            </ListItem>
-          ) : (
-            <></>
-          )}
-
-          {!accessStore.hideUserApiKey ? (
-            <ListItem
-              title={Locale.Settings.Token.Title}
-              subTitle={Locale.Settings.Token.SubTitle}
-            >
-              <PasswordInput
-                value={accessStore.token}
-                type="text"
-                placeholder={Locale.Settings.Token.Placeholder}
-                onChange={(e) => {
-                  accessStore.updateToken(e.currentTarget.value);
-                }}
-              />
-            </ListItem>
-          ) : null}
-
-          <ListItem
-            title={Locale.Settings.Usage.Title}
-            subTitle={
-              showUsage
-                ? loadingUsage
-                  ? Locale.Settings.Usage.IsChecking
-                  : Locale.Settings.Usage.SubTitle(
-                      usage?.used ?? "[?]",
-                      usage?.subscription ?? "[?]",
-                    )
-                : Locale.Settings.Usage.NoAccess
-            }
-          >
-            {!showUsage || loadingUsage ? (
-              <div />
+        {user.role == "admin" ? (
+          <List>
+            {enabledAccessControl ? (
+              <ListItem
+                title={Locale.Settings.AccessCode.Title}
+                subTitle={Locale.Settings.AccessCode.SubTitle}
+              >
+                <PasswordInput
+                  value={accessStore.accessCode}
+                  type="text"
+                  placeholder={Locale.Settings.AccessCode.Placeholder}
+                  onChange={(e) => {
+                    accessStore.updateCode(e.currentTarget.value);
+                  }}
+                />
+              </ListItem>
             ) : (
-              <IconButton
-                icon={<ResetIcon></ResetIcon>}
-                text={Locale.Settings.Usage.Check}
-                onClick={() => checkUsage(true)}
-              />
+              <></>
             )}
-          </ListItem>
-        </List>
+
+            {!accessStore.hideUserApiKey ? (
+              <ListItem
+                title={Locale.Settings.Token.Title}
+                subTitle={Locale.Settings.Token.SubTitle}
+              >
+                <PasswordInput
+                  value={accessStore.token}
+                  type="text"
+                  placeholder={Locale.Settings.Token.Placeholder}
+                  onChange={(e) => {
+                    accessStore.updateToken(e.currentTarget.value);
+                  }}
+                />
+              </ListItem>
+            ) : null}
+
+            <ListItem
+              title={Locale.Settings.Usage.Title}
+              subTitle={
+                showUsage
+                  ? loadingUsage
+                    ? Locale.Settings.Usage.IsChecking
+                    : Locale.Settings.Usage.SubTitle(
+                        usage?.used ?? "[?]",
+                        usage?.subscription ?? "[?]",
+                      )
+                  : Locale.Settings.Usage.NoAccess
+              }
+            >
+              {!showUsage || loadingUsage ? (
+                <div />
+              ) : (
+                <IconButton
+                  icon={<ResetIcon></ResetIcon>}
+                  text={Locale.Settings.Usage.Check}
+                  onClick={() => checkUsage(true)}
+                />
+              )}
+            </ListItem>
+          </List>
+        ) : (
+          <></>
+        )}
 
         <List>
           <ListItem

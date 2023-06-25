@@ -10,6 +10,7 @@ import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
 import MaskIcon from "../icons/mask.svg";
 import PluginIcon from "../icons/plugin.svg";
+import { logout } from "./login";
 
 import Locale from "../locales";
 
@@ -172,6 +173,9 @@ export function SideBar(props: { className?: string }) {
             <Link to={Path.Settings}>
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
+          </div>
+          <div className={styles["sidebar-action"]}>
+            <IconButton icon={<CloseIcon />} onClick={() => logout()} />
           </div>
           {/* <div className={styles["sidebar-action"]}>
             <a href={REPO_URL} target="_blank">

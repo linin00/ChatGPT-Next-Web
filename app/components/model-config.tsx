@@ -3,32 +3,38 @@ import { ALL_MODELS, ModalConfigValidator, ModelConfig } from "../store";
 import Locale from "../locales";
 import { InputRange } from "./input-range";
 import { List, ListItem, Select } from "./ui-lib";
+import { User, getUser } from "./login";
 
 export function ModelConfigList(props: {
   modelConfig: ModelConfig;
   updateConfig: (updater: (config: ModelConfig) => void) => void;
 }) {
+  const user: User = getUser();
   return (
     <>
-      <ListItem title={Locale.Settings.Model}>
-        <Select
-          value={props.modelConfig.model}
-          onChange={(e) => {
-            props.updateConfig(
-              (config) =>
-                (config.model = ModalConfigValidator.model(
-                  e.currentTarget.value,
-                )),
-            );
-          }}
-        >
-          {ALL_MODELS.map((v) => (
-            <option value={v.name} key={v.name} disabled={!v.available}>
-              {v.name}
-            </option>
-          ))}
-        </Select>
-      </ListItem>
+      {user.role == "admin" ? (
+        <ListItem title={Locale.Settings.Model}>
+          <Select
+            value={props.modelConfig.model}
+            onChange={(e) => {
+              props.updateConfig(
+                (config) =>
+                  (config.model = ModalConfigValidator.model(
+                    e.currentTarget.value,
+                  )),
+              );
+            }}
+          >
+            {ALL_MODELS.map((v) => (
+              <option value={v.name} key={v.name} disabled={!v.available}>
+                {v.name}
+              </option>
+            ))}
+          </Select>
+        </ListItem>
+      ) : (
+        <></>
+      )}
       <ListItem
         title={Locale.Settings.Temperature.Title}
         subTitle={Locale.Settings.Temperature.SubTitle}

@@ -14,6 +14,7 @@ import { getCSSVar, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
 import { ErrorBoundary } from "./error";
+import { isLogin } from "./login";
 
 import {
   HashRouter as Router,
@@ -46,6 +47,10 @@ const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
 });
 
 const MaskPage = dynamic(async () => (await import("./mask")).MaskPage, {
+  loading: () => <Loading noLogo />,
+});
+
+const Login = dynamic(async () => (await import("./login")).Login, {
   loading: () => <Loading noLogo />,
 });
 
@@ -128,6 +133,7 @@ function Screen() {
           <Route path={Path.Masks} element={<MaskPage />} />
           <Route path={Path.Chat} element={<Chat />} />
           <Route path={Path.Settings} element={<Settings />} />
+          {/* <Route path={Path.Login} element={<Login />} /> */}
         </Routes>
       </div>
     </div>
@@ -143,9 +149,7 @@ export function Home() {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <Screen />
-      </Router>
+      <Router>{isLogin() ? <Screen /> : <Login />}</Router>
     </ErrorBoundary>
   );
 }
