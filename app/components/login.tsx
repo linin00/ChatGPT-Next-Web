@@ -17,16 +17,19 @@ export function Login() {
 
     // 发送表单数据到后端
     try {
-      const response = await fetch("http://linin.xyz:8010/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://chatgpt.linin.xyz/auth/user/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: username,
+            password: password,
+          }),
         },
-        body: JSON.stringify({
-          name: username,
-          password: password,
-        }),
-      });
+      );
 
       if (response.ok) {
         console.log("登录成功");
