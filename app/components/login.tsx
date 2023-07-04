@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./Login.module.scss";
+import styles from "./login.module.scss";
 
 export type User = {
   name: string;
