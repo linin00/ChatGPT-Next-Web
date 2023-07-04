@@ -17,7 +17,7 @@ export function Login() {
 
     // 发送表单数据到后端
     try {
-      const response = await fetch("http://localhost:8080/user/login", {
+      const response = await fetch("http://linin.xyz:8010/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
